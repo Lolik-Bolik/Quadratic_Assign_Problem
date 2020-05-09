@@ -1,17 +1,28 @@
 import numpy as np
 
+__all__ = ['QAData', 'QAReader']
 
-def get_problem_data(path):
 
-    with open(path, 'r') as f:
-        file = f.read().split('\n')
+class QAData:
+    def __init__(self, n, distances, flows):
+        self.n = n
+        self.distances = distances
+        self.flows = flows
 
-    n = int(file[0])
-    distances = np.zeros((n, n), dtype=np.int32)
-    flows = np.zeros((n, n), dtype=np.int32)
-    for i in range(n):
-        distances[i, :] = [int(x) for x in file[1+i].split(' ') if x]
-        flows[i, :] = [int(x) for x in file[2+i+n].split(' ') if x]
-    return dict(n=n,
-                dists=distances,
-                flows=flows)
+
+class QAReader:
+    def __init__(self):
+        pass
+
+    def __call__(self, problem_filepath, *args, **kwargs):
+        print("Reading problem from {}".format(problem_filepath))
+        with open(problem_filepath, "r") as f:
+            n = int(f.readline().strip())
+            distances, flows = np.empty((n, n)), np.empty((n, n))
+            for i in range(n):
+                flows[i] = (list(map(int, f.readline().split())))
+            _ = f.readline()
+            for j in range(n):
+                distances[j] = (list(map(int, f.readline().split())))
+        return QAData(n, distances, flows)
+
