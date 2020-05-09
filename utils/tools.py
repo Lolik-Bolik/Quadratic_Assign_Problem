@@ -9,14 +9,21 @@ class QAData:
         self.distances = distances
         self.flows = flows
 
+    def init_solution(self):
+        return np.random.permutation(np.arange(self.n))
+
+    def compute_cost(self, data, solution):
+        cost = (solution * data.distances * data.flows).sum()
+        return cost
+
 
 class QAReader:
     def __init__(self):
         pass
 
-    def __call__(self, problem_filepath, *args, **kwargs):
-        print("Reading problem from {}".format(problem_filepath))
-        with open(problem_filepath, "r") as f:
+    def __call__(self, path):
+        print("Reading problem from {}".format(path))
+        with open(path, "r") as f:
             n = int(f.readline().strip())
             distances, flows = np.empty((n, n)), np.empty((n, n))
             for i in range(n):
@@ -26,3 +33,7 @@ class QAReader:
                 distances[j] = (list(map(int, f.readline().split())))
         return QAData(n, distances, flows)
 
+
+reader = QAReader()
+data = reader('./data/tai20a')
+print(data.init_solution())
