@@ -34,6 +34,6 @@ class QAReader:
         return QAData(n, distances, flows)
 
 
-reader = QAReader()
-data = reader('./data/tai20a')
-print(data.init_solution())
+# reader = QAReader()
+# data = reader('./data/tai20a')
+# print(data.init_solution())
