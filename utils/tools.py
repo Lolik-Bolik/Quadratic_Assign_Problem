@@ -14,9 +14,16 @@ class QAData:
         return np.random.permutation(np.arange(self.n))
 
     def compute_cost(self):
-        rows = np.arange(self.n)
-        cost = (self.distances[rows, self.solution] * self.flows[rows, self.solution]).sum()
+        # rows = np.arange(self.n)
+        # cost = (self.distances[rows, self.solution] * self.flows[rows, self.solution]).sum()
+        cost = 0
+        for i in range(self.n):
+            for j in range(self.n):
+                dist = self.distances[self.solution[i]][self.solution[j]]
+                flow = self.flows[i][j]
+                cost += flow * dist
         return cost
+    
 
 
 class QAReader:
@@ -36,6 +43,6 @@ class QAReader:
         return QAData(n, distances, flows)
 
 
-# reader = QAReader()
-# data = reader('./data/tai20a')
-# print(data.init_solution(), data.compute_cost())
+reader = QAReader()
+data = reader('./data/tai20a')
+print(data.init_solution(), data.compute_cost())
