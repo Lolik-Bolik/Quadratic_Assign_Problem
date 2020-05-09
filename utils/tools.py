@@ -1,6 +1,10 @@
 import numpy as np
 
-__all__ = ['QAData', 'QAReader']
+__all__ = ['QAData', 'QAReader', 'init_solution']
+
+
+def init_solution(n):
+    return np.random.permutation(np.arange(n))
 
 
 class QAData:
@@ -8,18 +12,14 @@ class QAData:
         self.n = n
         self.distances = distances
         self.flows = flows
-        self.solution = self.init_solution()
 
-    def init_solution(self):
-        return np.random.permutation(np.arange(self.n))
-
-    def compute_cost(self):
+    def compute_cost(self, solution):
         # rows = np.arange(self.n)
         # cost = (self.distances[rows, self.solution] * self.flows[rows, self.solution]).sum()
         cost = 0
         for i in range(self.n):
             for j in range(self.n):
-                dist = self.distances[self.solution[i]][self.solution[j]]
+                dist = self.distances[solution[i]][solution[j]]
                 flow = self.flows[i][j]
                 cost += flow * dist
         return cost
@@ -43,6 +43,6 @@ class QAReader:
         return QAData(n, distances, flows)
 
 
-reader = QAReader()
-data = reader('./data/tai20a')
-print(data.init_solution(), data.compute_cost())
+# reader = QAReader()
+# data = reader('./data/tai20a')
+# print(data.compute_cost())
