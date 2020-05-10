@@ -2,8 +2,6 @@ from utils import tools
 from tqdm import tqdm
 import random as rd
 from algorithms import LocalSearch
-import copy
-from itertools import combinations
 import numpy as np
 
 
@@ -33,7 +31,7 @@ class IteratedLocalSearch:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
             print(f'Start solution is {self.solution}')
         self.solution = self.solver(self.solution)
-        for _ in tqdm(range(self.iter_amount), position=0):
+        for _ in tqdm(range(self.iter_amount)):
             new_solution = self.solver(self.perturbation())
             self.acceptance_criterion(new_solution)
         if self.verbose:
