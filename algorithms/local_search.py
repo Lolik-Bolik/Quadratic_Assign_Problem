@@ -19,7 +19,7 @@ class LocalSearch:
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
             print(f'Start solution is {self.solution}')
-        for _ in tqdm(range(self.iter_amount), position=0):
+        for _ in tqdm(range(self.iter_amount), position=0, disable=not self.verbose):
             best_solution = self.solution
             for _ in range(self.iter_amount):
                 ind_left = rd.randint(0, self.data.n - 1)
