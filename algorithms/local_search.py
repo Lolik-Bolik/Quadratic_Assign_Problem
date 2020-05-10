@@ -2,6 +2,8 @@ from utils import tools
 from tqdm import tqdm
 import random as rd
 import copy
+from itertools import combinations
+import numpy as np
 
 
 class LocalSearch:
@@ -18,7 +20,7 @@ class LocalSearch:
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
             print(f'Start solution is {self.solution}')
-        for _ in tqdm(range(self.iter_amount), position=0, disable=not self.verbose):
+        for _ in tqdm(range(self.iter_amount), position=0):
             best_solution = self.solution
             for _ in range(self.iter_amount):
                 ind_left = rd.randint(0, self.data.n - 1)
@@ -35,12 +37,82 @@ class LocalSearch:
             print('Final cost {}'.format(final_cost))
         return self.solution
 
+    def count_delta(self, r, s):
+        diff = 0
+        pi = self.solution
+        for k in range(self.data.n):
+            if k != r and k != s:
+                diff += (self.data.flows[k, r] + self.data.flows[r, k]) * \
+                        (self.data.distances[pi[s], pi[k]] - self.data.distances[pi[r], pi[k]]) + \
+                        (self.data.flows[k, s] + self.data.flows[s, k]) * \
+                        (self.data.distances[pi[r], pi[k]] - self.data.distances[pi[s], pi[k]])
+        return diff
+
+    def first_improvement(self):
+        if self.verbose:
+            print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
+            print(f'Start solution is {self.solution}')
+
+        comb = list(combinations(np.arange(self.data.n, dtype=np.int32), 2))
+        dont_look_bits = np.zeros(self.data.n, dtype=np.bool)
+        for i in tqdm(range(self.iter_amount), position=0):
+            curr_city = 0
+            counter = 0
+            for opt in comb:
+                if dont_look_bits[opt[0]] or dont_look_bits[opt[1]]:
+                    continue
+                opt = list(opt)
+                tmp_solution = copy.copy(self.solution)
+                tmp_solution[opt] = tmp_solution[opt][::-1]
+                cost = self.data.compute_cost(tmp_solution)
+                if cost < self.current_cost:
+                    self.current_cost = cost
+                    self.solution = tmp_solution
+                    break
+                if curr_city == opt[0]:
+                    counter += 1
+                elif curr_city != opt[0] and counter == self.data.n - 1 - curr_city:
+                    dont_look_bits[curr_city] = 1
+                    curr_city += 1
+                    counter = 0
+                else:
+                    curr_city += 1
+                    counter = 0
+
+        if self.verbose:
+            final_cost = self.data.compute_cost(self.solution)
+            if self.verbose:
+                print('Final cost {}'.format(final_cost))
+        return self.solution
+
+    def best_improvement(self):
+        if self.verbose:
+            print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
+            print(f'Start solution is {self.solution}')
+
+        comb = list(combinations(np.arange(self.data.n, dtype=np.int32), 2))
+        for _ in tqdm(range(self.iter_amount), position=0):
+            min_delta = 0
+            optimal_opt = None
+            for opt in comb:
+                opt = list(opt)
+                delta = self.count_delta(*opt)
+                if delta < min_delta:
+                    min_delta = delta
+                    optimal_opt = opt
+            self.solution[optimal_opt] = self.solution[optimal_opt][::-1]
+        if self.verbose:
+            final_cost = self.data.compute_cost(self.solution)
+            if self.verbose:
+                print('Final cost {}'.format(final_cost))
+        return self.solution
+
     def __call__(self):
         if self.method == '2-opt':
             return self.stohastic_2_opt()
         elif self.method == 'first-improvement':
-            pass
+            return self.first_improvement()
         else:
-            pass
+            return self.best_improvement()
 
 
