@@ -7,9 +7,8 @@ import numpy as np
 
 
 class LocalSearch:
-    def __init__(self, path_to_data, method, verbose, n_iter):
-        reader = tools.QAReader()
-        self.data = reader(path_to_data)
+    def __init__(self, data, method, verbose, n_iter, solution=None):
+        self.data = data
         self.method = method
         self.verbose = verbose
         self.iter_amount = n_iter
@@ -107,7 +106,9 @@ class LocalSearch:
                 print('Final cost {}'.format(final_cost))
         return self.solution
 
-    def __call__(self):
+    def __call__(self, solution=None):
+        if solution is not None:
+            self.solution = solution
         if self.method == '2-opt':
             return self.stohastic_2_opt()
         elif self.method == 'first-improvement':
