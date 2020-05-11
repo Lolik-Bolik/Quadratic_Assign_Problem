@@ -46,6 +46,34 @@ class LocalSearch:
                         (self.data.distances[pi[r], pi[k]] - self.data.distances[pi[s], pi[k]])
         return diff
 
+    def first_delta_improvement(self):
+        if self.verbose:
+            print('Start cost {}'.format(self.current_cost))
+
+        dont_look = {x: np.zeros(self.data.n, dtype=np.int32) for x in range(self.data.n)}
+        for i in tqdm(range(self.data.n), disable=not self.verbose):
+            flag = True
+            for opt in combinations(np.arange(self.data.n, dtype=np.int32), 2):
+                if (sum(dont_look[opt[0]]) >= 19 or
+                        sum(dont_look[opt[1]]) >= 19):
+                    continue
+                diff = self.count_delta(opt[0], opt[1])
+                if diff < 0:
+                    self.current_cost += diff
+                    self.solution[list(opt)] = self.solution[list(opt)][::-1]
+                    flag = False
+                    break
+                dont_look[opt[0]][opt[1]] = 1
+                dont_look[opt[1]][opt[0]] = 1
+            if flag and self.verbose:
+                print('No better solutions, stoping...')
+                break
+        final_cost = self.data.compute_cost(self.solution)
+        if self.verbose:
+            print('End cost {}'.format(self.current_cost))
+
+        return self.solution, final_cost
+
     def first_improvement(self):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
@@ -107,6 +135,8 @@ class LocalSearch:
             return self.stohastic_2_opt(**kwargs)
         elif self.method == 'first-improvement':
             return self.first_improvement()
+        elif self.method == 'first-delta-improvement':
+            return self.first_delta_improvement()
         else:
             return self.best_improvement()
 

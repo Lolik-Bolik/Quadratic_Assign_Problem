@@ -20,10 +20,12 @@ best_known = {
 }
 
 
-def save_cost_history_plot(history, file, method):
+def save_cost_history_plot(history, file, method,n_iter):
     plt.figure(figsize=(10, 5))
+    x = [0, n_iter]
+    y = [best_known[file]] * len(x)
     plt.plot(history, label='cost_function')
-    plt.plot(0, best_known[file], 'o', label='optimum')
+    plt.plot(x, y,  'go-', label='optimum')
     plt.grid()
     plt.legend()
     plt.title(method)
@@ -32,8 +34,9 @@ def save_cost_history_plot(history, file, method):
 
 
 def main(args):
+    n_iter = 20
     if args.make_csv:
-        with open('statistic_2.csv', 'w') as file:
+        with open('statistic_3.csv', 'w') as file:
             columns_names = ['File name', 'Method', 'Best known', 'Result', 'Time']
             writer = csv.DictWriter(file, fieldnames=columns_names)
             writer.writeheader()
@@ -41,7 +44,7 @@ def main(args):
             benchmarks = [f for f in listdir(args.path) if isfile(join(args.path, f))]
             for file in benchmarks:
                 data = reader(path.join(args.path, file))
-                algorithms = [(name, f(data, '2-opt', True, 1)) for name, f in algo.__dict__.items() if callable(f)]
+                algorithms = [(name, f(data, '2-opt', True, n_iter)) for name, f in algo.__dict__.items() if callable(f)]
                 for name, algorithm in algorithms:
                     Path(f"./{name}").mkdir(parents=True, exist_ok=True)
                     print(f'{name} working on {file}')
@@ -51,7 +54,7 @@ def main(args):
                     np.savetxt(f'./{name}/{file}.out', solution.reshape(1, solution.shape[0]), fmt='%d')
                     if name != 'LocalSearch':
                         print(algorithm.cost_history)
-                        save_cost_history_plot(algorithm.cost_history, file, name)
+                        save_cost_history_plot(algorithm.cost_history, file, name, n_iter)
                     writer.writerow({
                         'File name': file,
                         'Method': name,
