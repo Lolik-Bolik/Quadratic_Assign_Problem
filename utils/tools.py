@@ -39,7 +39,6 @@ class QAReader:
         pass
 
     def __call__(self, path):
-        print("Reading problem from {}".format(path))
         with open(path, "r") as f:
             n = int(f.readline().strip())
             distances, flows = np.empty((n, n)), np.empty((n, n))

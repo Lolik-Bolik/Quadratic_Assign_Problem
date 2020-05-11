@@ -15,7 +15,7 @@ class GuidedLocalSearch:
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
-        self.solver = LocalSearch(self.data, method, False, 5)
+        self.solver = LocalSearch(self.data, method, False, int(self.iter_amount * 0.1))
         self.penalty = np.zeros((self.data.n, self.data.n))
         self.indicator_func = np.zeros((self.data.n, self.data.n))
         self.params = {'method': 'guided', 'mu': 5000, 'penalty': self.penalty,

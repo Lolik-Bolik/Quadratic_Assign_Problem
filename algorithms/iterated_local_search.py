@@ -13,7 +13,7 @@ class IteratedLocalSearch:
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
-        self.solver = LocalSearch(self.data, method, False, 5)
+        self.solver = LocalSearch(self.data, method, False, int(self.iter_amount * 0.1))
         self.cost_history = []
 
     def perturbation(self):
