@@ -52,7 +52,7 @@ class LocalSearch:
 
         comb = list(combinations(np.arange(self.data.n, dtype=np.int32), 2))
         dont_look_bits = np.zeros(self.data.n, dtype=np.bool)
-        for i in tqdm(range(self.iter_amount)):
+        for i in tqdm(range(self.iter_amount), disable=not self.verbose):
             curr_city = 0
             counter = 0
             for opt in comb:
@@ -85,7 +85,7 @@ class LocalSearch:
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
         comb = list(combinations(np.arange(self.data.n, dtype=np.int32), 2))
-        for _ in tqdm(range(self.iter_amount)):
+        for _ in tqdm(range(self.iter_amount), disable=not self.verbose):
             min_delta = 0
             optimal_opt = None
             for opt in comb:

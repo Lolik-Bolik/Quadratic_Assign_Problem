@@ -15,11 +15,12 @@ class GuidedLocalSearch:
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
-        self.solver = LocalSearch(self.data, '2-opt', False, 20)
+        self.solver = LocalSearch(self.data, method, False, 20)
         self.penalty = np.zeros((self.data.n, self.data.n))
         self.indicator_func = np.zeros((self.data.n, self.data.n))
         self.params = {'method': 'guided', 'mu': 100, 'penalty': self.penalty,
                        'indicator': self.indicator_func}
+        self.cost_history = []
 
     def cost_func(self, solution, u, v):
         cost = 0
@@ -42,9 +43,9 @@ class GuidedLocalSearch:
         for _ in tqdm(range(self.data.n)):
             max_util_index = None
             max_util_value = 0
-            new_solution, cost = self.solver(self.solution, **self.params)
+            new_solution, new_cost_value = self.solver(self.solution, **self.params)
+            self.cost_history.append(new_cost_value)
             self.update_indicator(new_solution)
-            new_cost_value = self.data.compute_cost(new_solution)
             if new_cost_value < self.current_cost:
                 self.solution = new_solution
                 self.current_cost = new_cost_value

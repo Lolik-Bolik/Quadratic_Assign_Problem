@@ -13,7 +13,8 @@ class IteratedLocalSearch:
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
-        self.solver = LocalSearch(self.data, '2-opt', False, 20)
+        self.solver = LocalSearch(self.data, method, False, 20)
+        self.cost_history = []
 
     def perturbation(self):
         k = rd.randint(2, self.data.n)
@@ -33,6 +34,7 @@ class IteratedLocalSearch:
         self.solution, cost = self.solver(self.solution)
         for _ in tqdm(range(self.iter_amount)):
             new_solution, cost = self.solver(self.perturbation())
+            self.cost_history.append(cost)
             self.acceptance_criterion(new_solution)
         final_cost = self.data.compute_cost(self.solution)
         if self.verbose:
