@@ -25,12 +25,16 @@ def save_cost_history_plot(history, file, method,n_iter):
     x = [0, n_iter]
     y = [best_known[file]] * len(x)
     plt.plot(history, label='cost_function')
-    plt.plot(x, y,  'go-', label='optimum')
+    plt.plot(x, y,  'go-', label='best_known')
+    min_value = min(history)
+    min_idx = history.index(min_value)
+    plt.plot(min_idx, min_value, 'ro', label='found_optimum')
     plt.grid()
     plt.legend()
     plt.title(method)
-    plt.savefig(f'{method}_{file}.png')
-    print(f'{method}_{file}.png saved!')
+    Path(f"./images").mkdir(parents=True, exist_ok=True)
+    plt.savefig(f'./images/{method}_{file}.png')
+    print(f'./images/{method}_{file}.png saved!')
 
 
 def main(args):
@@ -44,7 +48,7 @@ def main(args):
             benchmarks = [f for f in listdir(args.path) if isfile(join(args.path, f))]
             for file in benchmarks:
                 data = reader(path.join(args.path, file))
-                algorithms = [(name, f(data, 'first-delta-improvement', True, n_iter)) for name, f in algo.__dict__.items() if callable(f)]
+                algorithms = [(name, f(data, 'first-with-delta', True, n_iter)) for name, f in algo.__dict__.items() if callable(f)]
                 for name, algorithm in algorithms:
                     Path(f"./{name}").mkdir(parents=True, exist_ok=True)
                     print(f'{name} working on {file}')

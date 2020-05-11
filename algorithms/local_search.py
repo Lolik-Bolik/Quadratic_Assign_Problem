@@ -62,7 +62,7 @@ class LocalSearch:
         return previous + 2 * (self.data.flows[r, u] - self.data.flows[r, v] + self.data.flows[s, v] - self.data.flows[s, u]) * \
                           (self.data.distances[pi[s], pi[u]] - self.data.distances[pi[s], pi[v]] + self.data.distances[pi[r], pi[v]] - self.data.distances[pi[r], pi[u]])
 
-    def first_delta_improvement(self):
+    def first_with_delta(self):
         if self.verbose:
             print('Start cost {}'.format(self.current_cost))
 
@@ -193,8 +193,8 @@ class LocalSearch:
             return self.stohastic_2_opt(**kwargs)
         elif self.method == 'first-improvement':
             return self.first_improvement()
-        elif self.method == 'first-delta-improvement':
-            return self.first_delta_improvement()
+        elif self.method == 'first-with-delta':
+            return self.first_with_delta()
         else:
             return self.best_improvement()
 
