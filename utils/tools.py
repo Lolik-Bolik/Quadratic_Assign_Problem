@@ -13,17 +13,25 @@ class QAData:
         self.distances = distances
         self.flows = flows
 
-    def compute_cost(self, solution):
-        # rows = np.arange(self.n)
-        # cost = (self.distances[rows, self.solution] * self.flows[rows, self.solution]).sum()
+    def compute_cost(self, solution, **kwargs):
         cost = 0
         for i in range(self.n):
             for j in range(self.n):
                 dist = self.distances[solution[i]][solution[j]]
                 flow = self.flows[i][j]
                 cost += flow * dist
-        return cost
-    
+
+        if 'method' not in kwargs.keys():
+            return cost
+        elif kwargs['method'] == 'guided':
+            augmented_part = 0
+            mu = kwargs['mu']
+            indicator_func = kwargs['indicator']
+            penalty = kwargs['penalty']
+            for u in range(self.n):
+                for v in range(self.n):
+                    augmented_part += indicator_func[u][v] * penalty[u][v]
+            return cost + mu * augmented_part
 
 
 class QAReader:
@@ -42,7 +50,3 @@ class QAReader:
                 distances[j] = (list(map(int, f.readline().split())))
         return QAData(n, distances, flows)
 
-
-# reader = QAReader()
-# data = reader('./data/tai20a')
-# print(data.compute_cost())
