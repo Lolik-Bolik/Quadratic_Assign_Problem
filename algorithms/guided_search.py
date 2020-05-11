@@ -15,10 +15,10 @@ class GuidedLocalSearch:
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
-        self.solver = LocalSearch(self.data, method, False, 20)
+        self.solver = LocalSearch(self.data, method, False, 5)
         self.penalty = np.zeros((self.data.n, self.data.n))
         self.indicator_func = np.zeros((self.data.n, self.data.n))
-        self.params = {'method': 'guided', 'mu': 100, 'penalty': self.penalty,
+        self.params = {'method': 'guided', 'mu': 5000, 'penalty': self.penalty,
                        'indicator': self.indicator_func}
         self.cost_history = []
 
@@ -40,7 +40,7 @@ class GuidedLocalSearch:
     def __call__(self):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
-        for _ in tqdm(range(self.data.n)):
+        for _ in tqdm(range(self.iter_amount)):
             max_util_index = None
             max_util_value = 0
             new_solution, new_cost_value = self.solver(self.solution, **self.params)

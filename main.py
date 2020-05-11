@@ -38,7 +38,7 @@ def main(args):
             benchmarks = [f for f in listdir(args.path) if isfile(join(args.path, f))]
             for file in benchmarks:
                 data = reader(path.join(args.path, file))
-                algorithms = [(name, f(data, 'first-improvement', True, 1)) for name, f in algo.__dict__.items() if callable(f)]
+                algorithms = [(name, f(data, '2-opt', True, 150)) for name, f in algo.__dict__.items() if callable(f)]
                 for name, algorithm in algorithms:
                     print(f'{name} working on {file}')
                     start_time = time.time()
@@ -59,9 +59,9 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--path", type=str,
-                        help="path to benchmark data")
+                        help="path to benchmark data", default='./data')
     parser.add_argument("-csv", "--make_csv", action='store_true',
-                        help="path to benchmark data")
+                        help="path to benchmark data", default=True)
     args = parser.parse_args()
     main(args)
 
