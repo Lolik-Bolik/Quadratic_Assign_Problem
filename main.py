@@ -34,7 +34,7 @@ def save_cost_history_plot(history, file, method,n_iter):
 
 
 def main(args):
-    n_iter = 20
+    n_iter = 100
     if args.make_csv:
         with open('statistic_3.csv', 'w') as file:
             columns_names = ['File name', 'Method', 'Best known', 'Result', 'Time']
@@ -44,8 +44,7 @@ def main(args):
             benchmarks = [f for f in listdir(args.path) if isfile(join(args.path, f))]
             for file in benchmarks:
                 data = reader(path.join(args.path, file))
-                algorithms = [(name, f(data, '2-opt', True, 150)) for name, f in algo.__dict__.items() if callable(f)]
-                algorithms = [(name, f(data, '2-opt', True, n_iter)) for name, f in algo.__dict__.items() if callable(f)]
+                algorithms = [(name, f(data, 'first-delta-improvement', True, n_iter)) for name, f in algo.__dict__.items() if callable(f)]
                 for name, algorithm in algorithms:
                     Path(f"./{name}").mkdir(parents=True, exist_ok=True)
                     print(f'{name} working on {file}')

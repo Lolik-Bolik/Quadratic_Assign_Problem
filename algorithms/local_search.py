@@ -51,12 +51,11 @@ class LocalSearch:
         pi = self.solution
         for k in range(self.data.n):
             if k != r and k != s:
-                diff += 2 * (self.data.flows[k, r]) * \
-                        (self.data.distances[pi[k], pi[s]] - self.data.distances[pi[k], pi[r]]) + \
-                        (self.data.flows[k, s]) * \
-                        (self.data.distances[pi[k], pi[r]] - self.data.distances[pi[k], pi[s]])
+                diff += (self.data.flows[k, r] + self.data.flows[r, k]) * \
+                        (self.data.distances[pi[s], pi[k]] - self.data.distances[pi[r], pi[k]]) + \
+                        (self.data.flows[k, s] + self.data.flows[s, k]) * \
+                        (self.data.distances[pi[r], pi[k]] - self.data.distances[pi[s], pi[k]])
         return diff
-
 
     def count_delta_with_previous(self, previous, u, v, r, s):
         pi = self.solution
@@ -67,29 +66,43 @@ class LocalSearch:
         if self.verbose:
             print('Start cost {}'.format(self.current_cost))
 
-        dont_look = {x: np.zeros(self.data.n, dtype=np.int32) for x in range(self.data.n)}
-        for i in tqdm(range(self.data.n), disable=not self.verbose):
-            flag = True
-            for opt in combinations(np.arange(self.data.n, dtype=np.int32), 2):
-                if (sum(dont_look[opt[0]]) >= 19 or
-                        sum(dont_look[opt[1]]) >= 19):
-                    continue
-                diff = self.count_delta(opt[0], opt[1])
-                if diff < 0:
-                    self.current_cost += diff
-                    self.solution[list(opt)] = self.solution[list(opt)][::-1]
-                    flag = False
-                    break
-                dont_look[opt[0]][opt[1]] = 1
-                dont_look[opt[1]][opt[0]] = 1
-            if flag and self.verbose:
-                print('No better solutions, stoping...')
+        dont_look_bits = np.zeros(self.data.n, dtype=np.bool)
+        for _ in tqdm(range(self.iter_amount), disable=not self.verbose):
+            comb = combinations(np.arange(self.data.n, dtype=np.int32), 2)
+            if not self.improved:
+                self.no_improvements += 1
+            if self.no_improvements == self.patience or np.all(dont_look_bits):
                 break
+            self.improved = False
+            curr_city = 0
+            counter = 0
+            for opt in comb:
+                if dont_look_bits[opt[0]] or dont_look_bits[opt[1]]:
+                    continue
+                opt = list(opt)
+                if curr_city != opt[0] and counter == self.data.n - 1 - curr_city:
+                    # print(curr_city)
+                    dont_look_bits[curr_city] = 1
+                    curr_city += 1
+                    counter = 0
+                elif curr_city != opt[0]:
+                    curr_city += 1
+                    counter = 0
+                delta = self.count_delta(opt[0], opt[1])
+                if delta < 0:
+                    self.improved = True
+                    self.no_improvements = 0
+                    self.current_cost += delta
+                    self.solution[opt] = self.solution[opt][::-1]
+                    break
+                elif curr_city == opt[0]:
+                    counter += 1
+
         final_cost = self.data.compute_cost(self.solution)
         if self.verbose:
-            print('End cost {}'.format(self.current_cost))
-
+            print('Final cost {}'.format(final_cost))
         return self.solution, final_cost
+
 
     def first_improvement(self):
         if self.verbose:
