@@ -51,10 +51,10 @@ class LocalSearch:
         pi = self.solution
         for k in range(self.data.n):
             if k != r and k != s:
-                diff += (self.data.flows[k, r] + self.data.flows[r, k]) * \
-                        (self.data.distances[pi[s], pi[k]] - self.data.distances[pi[r], pi[k]]) + \
-                        (self.data.flows[k, s] + self.data.flows[s, k]) * \
-                        (self.data.distances[pi[r], pi[k]] - self.data.distances[pi[s], pi[k]])
+                diff += 2 * (self.data.flows[k, r]) * \
+                        (self.data.distances[pi[k], pi[s]] - self.data.distances[pi[k], pi[r]]) + \
+                        (self.data.flows[k, s]) * \
+                        (self.data.distances[pi[k], pi[r]] - self.data.distances[pi[k], pi[s]])
         return diff
 
     def count_delta_with_previous(self, previous, u, v, r, s):
@@ -119,20 +119,16 @@ class LocalSearch:
             if self.no_improvements == self.patience:
                 break
             self.improved = False
-            min_delta = 0
+            min_delta = previous_delta if previous_delta is not None else 0
             optimal_opt = None
             for opt in comb:
                 opt = list(opt)
-                # Вот тут возникает вопрос с переиспользованием previous_delta. Пусть мы считаем k + 1 решение.
-                # Если previous_delta - это разница между целевой функцией k - 1 решения и k решения, то как она помогает
-                # В подсчете разницы между ц.ф k решения и ц.ф k + 1 решения?
-                # И кроме того, как считать, если intersect != empty_set? Считать по обычной delta или просто скипать такие перестановки?
-                # Поскольку это переиспользование напрочь ломает алгоритм, оно закомментировано
-                # И итоговая сложность O(n^3)
-                # if previous_opt is not None and not set(opt).intersection(set(previous_opt)):
-                #     delta = self.count_delta_with_previous(previous_delta, *opt, *previous_opt)
-                # else:
-                delta = self.count_delta(*opt)
+                if previous_opt is not None and not opt == previous_opt:
+                    delta = self.count_delta_with_previous(previous_delta, *opt, *previous_opt)
+                elif opt == previous_opt:
+                    continue
+                else:
+                    delta = self.count_delta(*opt)
                 if delta < min_delta:
                     min_delta = delta
                     optimal_opt = opt

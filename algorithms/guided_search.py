@@ -33,9 +33,8 @@ class GuidedLocalSearch:
 
     def update_indicator(self, solution):
         self.indicator_func = np.zeros((self.data.n, self.data.n))
-        for u in solution:
-            for v in np.arange(self.data.n):
-                self.indicator_func[v][u] = 1
+        for u, v in enumerate(solution):
+            self.indicator_func[u][v] = 1
 
     def __call__(self):
         if self.verbose:
