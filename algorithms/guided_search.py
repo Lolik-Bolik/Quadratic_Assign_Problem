@@ -8,16 +8,17 @@ import numpy as np
 
 
 class GuidedLocalSearch:
-    def __init__(self, data, verbose, n_iter):
+    def __init__(self, data, method, verbose, n_iter):
         self.data = data
         self.verbose = verbose
+        self.method = method
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
-        self.solver = LocalSearch(self.data, '2-opt', False, 30)
+        self.solver = LocalSearch(self.data, '2-opt', False, 20)
         self.penalty = np.zeros((self.data.n, self.data.n))
         self.indicator_func = np.zeros((self.data.n, self.data.n))
-        self.params = {'method': 'guided', 'mu': 100, 'penalty' : self.penalty,
+        self.params = {'method': 'guided', 'mu': 100, 'penalty': self.penalty,
                        'indicator': self.indicator_func}
 
     def cost_func(self, solution, u, v):
@@ -38,11 +39,10 @@ class GuidedLocalSearch:
     def __call__(self):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
-            print(f'Start solution is {self.solution}')
         for _ in tqdm(range(self.data.n)):
             max_util_index = None
             max_util_value = 0
-            new_solution = self.solver(self.solution, **self.params)
+            new_solution, cost = self.solver(self.solution, **self.params)
             self.update_indicator(new_solution)
             new_cost_value = self.data.compute_cost(new_solution)
             if new_cost_value < self.current_cost:
@@ -57,6 +57,6 @@ class GuidedLocalSearch:
         final_cost = self.data.compute_cost(self.solution)
         if self.verbose:
             print('Final cost {}'.format(final_cost))
-        return self.solution
+        return self.solution, final_cost
 
 

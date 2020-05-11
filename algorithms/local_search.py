@@ -18,7 +18,6 @@ class LocalSearch:
     def stohastic_2_opt(self, **kwargs):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
-            print(f'Start solution is {self.solution}')
         for _ in tqdm(range(self.iter_amount), disable=not self.verbose):
             best_solution = self.solution
             for _ in range(self.iter_amount):
@@ -34,7 +33,7 @@ class LocalSearch:
         final_cost = self.data.compute_cost(self.solution, **kwargs)
         if self.verbose:
             print('Final cost {}'.format(final_cost))
-        return self.solution
+        return self.solution, final_cost
 
     def count_delta(self, r, s):
         diff = 0
@@ -50,7 +49,6 @@ class LocalSearch:
     def first_improvement(self):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
-            print(f'Start solution is {self.solution}')
 
         comb = list(combinations(np.arange(self.data.n, dtype=np.int32), 2))
         dont_look_bits = np.zeros(self.data.n, dtype=np.bool)
@@ -78,17 +76,14 @@ class LocalSearch:
                     curr_city += 1
                     counter = 0
 
+        final_cost = self.data.compute_cost(self.solution)
         if self.verbose:
-            final_cost = self.data.compute_cost(self.solution)
-            if self.verbose:
-                print('Final cost {}'.format(final_cost))
-        return self.solution
+            print('Final cost {}'.format(final_cost))
+        return self.solution, final_cost
 
     def best_improvement(self):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
-            print(f'Start solution is {self.solution}')
-
         comb = list(combinations(np.arange(self.data.n, dtype=np.int32), 2))
         for _ in tqdm(range(self.iter_amount)):
             min_delta = 0
@@ -100,11 +95,10 @@ class LocalSearch:
                     min_delta = delta
                     optimal_opt = opt
             self.solution[optimal_opt] = self.solution[optimal_opt][::-1]
+        final_cost = self.data.compute_cost(self.solution)
         if self.verbose:
-            final_cost = self.data.compute_cost(self.solution)
-            if self.verbose:
-                print('Final cost {}'.format(final_cost))
-        return self.solution
+            print('Final cost {}'.format(final_cost))
+        return self.solution, final_cost
 
     def __call__(self, solution=None, **kwargs):
         if solution is not None:

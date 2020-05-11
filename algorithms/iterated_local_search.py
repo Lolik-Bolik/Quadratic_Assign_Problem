@@ -6,9 +6,10 @@ import numpy as np
 
 
 class IteratedLocalSearch:
-    def __init__(self, data, verbose, n_iter):
+    def __init__(self, data, method, verbose, n_iter):
         self.data = data
         self.verbose = verbose
+        self.method = method
         self.iter_amount = n_iter
         self.solution = tools.init_solution(self.data.n)
         self.current_cost = self.data.compute_cost(self.solution)
@@ -29,13 +30,11 @@ class IteratedLocalSearch:
     def __call__(self):
         if self.verbose:
             print(f'Starting value of cost func is {self.data.compute_cost(self.solution)}')
-            print(f'Start solution is {self.solution}')
-        self.solution = self.solver(self.solution)
+        self.solution, cost = self.solver(self.solution)
         for _ in tqdm(range(self.iter_amount)):
-            new_solution = self.solver(self.perturbation())
+            new_solution, cost = self.solver(self.perturbation())
             self.acceptance_criterion(new_solution)
+        final_cost = self.data.compute_cost(self.solution)
         if self.verbose:
-            final_cost = self.data.compute_cost(self.solution)
-            if self.verbose:
-                print('Final cost {}'.format(final_cost))
-        return self.solution
+            print('Final cost {}'.format(final_cost))
+        return self.solution, final_cost
