@@ -36,7 +36,7 @@ def save_cost_history_plot(history, file, method,n_iter):
 def main(args):
     n_iter = 100
     if args.make_csv:
-        with open('statistic_3.csv', 'w') as file:
+        with open('statistic.csv', 'w') as file:
             columns_names = ['File name', 'Method', 'Best known', 'Result', 'Time']
             writer = csv.DictWriter(file, fieldnames=columns_names)
             writer.writeheader()
@@ -51,7 +51,7 @@ def main(args):
                     start_time = time.time()
                     solution, final_cost = algorithm()
                     work_time = round(time.time() - start_time, 4)
-                    np.savetxt(f'./{name}/{file}.out', solution.reshape(1, solution.shape[0]), fmt='%d')
+                    np.savetxt(f'./{name}/{file}.sol', solution.reshape(1, solution.shape[0]), fmt='%d')
                     if name != 'LocalSearch':
                         print(algorithm.cost_history)
                         save_cost_history_plot(algorithm.cost_history, file, name, n_iter)
