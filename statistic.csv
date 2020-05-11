@@ -1,0 +1,16 @@
+File name,Method,Best known,Result,Time
+tai80a,LocalSearch,13499184,15768902.0,0.0232
+tai80a,IteratedLocalSearch,13499184,15091312.0,4.013
+tai80a,GuidedLocalSearch,13499184,14576334.0,264.3458
+tai40a,LocalSearch,3139370,3695670.0,0.0049
+tai40a,IteratedLocalSearch,3139370,3547788.0,1.0324
+tai40a,GuidedLocalSearch,3139370,3490822.0,32.9237
+tai100a,LocalSearch,21044752,24063234.0,0.0229
+tai100a,IteratedLocalSearch,21044752,23463992.0,6.3313
+tai100a,GuidedLocalSearch,21044752,22737212.0,509.7081
+tai60a,LocalSearch,7205962,8500094.0,0.0087
+tai60a,IteratedLocalSearch,7205962,8224350.0,2.1642
+tai60a,GuidedLocalSearch,7205962,7902586.0,112.6912
+tai20a,LocalSearch,703482,896314.0,0.0012
+tai20a,IteratedLocalSearch,703482,795548.0,0.2606
+tai20a,GuidedLocalSearch,703482,786450.0,4.2153

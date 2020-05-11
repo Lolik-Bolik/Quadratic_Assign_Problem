@@ -7,6 +7,9 @@ import argparse
 import csv
 import time
 import matplotlib.pyplot as plt
+from pathlib import Path
+import numpy as np
+
 
 best_known = {
     'tai20a': 703482,
@@ -38,12 +41,14 @@ def main(args):
             benchmarks = [f for f in listdir(args.path) if isfile(join(args.path, f))]
             for file in benchmarks:
                 data = reader(path.join(args.path, file))
-                algorithms = [(name, f(data, 'first-improvement', True, 1)) for name, f in algo.__dict__.items() if callable(f)]
+                algorithms = [(name, f(data, '2-opt', True, 1)) for name, f in algo.__dict__.items() if callable(f)]
                 for name, algorithm in algorithms:
+                    Path(f"./{name}").mkdir(parents=True, exist_ok=True)
                     print(f'{name} working on {file}')
                     start_time = time.time()
                     solution, final_cost = algorithm()
                     work_time = round(time.time() - start_time, 4)
+                    np.savetxt(f'./{name}/{file}.out', solution.reshape(1, solution.shape[0]), fmt='%d')
                     if name != 'LocalSearch':
                         print(algorithm.cost_history)
                         save_cost_history_plot(algorithm.cost_history, file, name)
